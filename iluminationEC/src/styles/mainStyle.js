@@ -30,6 +30,7 @@ const styles = StyleSheet.create({
         borderColor: '#845ec2',
         alignItems: 'center',
         justifyContent: 'center',
+        position: 'relative',
     },
     button:{
         minWidth:'100%',
@@ -44,6 +45,11 @@ const styles = StyleSheet.create({
     text :{
         fontSize: 17,
         fontWeight: '400',
+    },
+    touch:{
+        position: 'absolute',
+        top:10,
+        right:15,
     }
 })
 export default styles
