@@ -1,18 +1,31 @@
-import { View, Text, TextInput, TouchableOpacity, } from 'react-native'
+import { View, Text, TextInput, TouchableOpacity, Alert, } from 'react-native'
 import style from '../../styles/LoginStyle'
 import React, { useState, useContext } from 'react'
 import { ButtonContext } from "../../../ButtonContext"
 
 const Login = () => {
-    const { comparedUser } = useContext(ButtonContext);
+    const { comparedUser, setApproved, approved } = useContext(ButtonContext);
 
     const [user, setUser] = useState('');
     const [password, setPassword] = useState('');
 
     const handleLogin = () => {
-        if(!comparedUser(user.trim().toLowerCase(), password.trim())){
+        const compared = comparedUser(user.trim().toLowerCase(), password.trim().toLowerCase());
+
+        console.log(compared)
+
+        if(compared){
+            setApproved(compared);
+            return
+        }
+
+        if(user == '' || password == ''){
+            Alert.alert('Error', 'Los campos son obligatorios')
+        }
+        else if(!approved){
             setUser('');
             setPassword('');
+            Alert.alert('Error', 'Credenciales incorrectas')
         }
     }
 

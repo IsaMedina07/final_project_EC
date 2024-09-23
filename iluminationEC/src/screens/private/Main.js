@@ -8,7 +8,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 
 const Main = ( ) => {
 
-    const { comparedUser, toggleRoom, Room, Living, Bathroom, Kitchen } = useContext(ButtonContext);
+    const { setApproved, toggleRoom, Room, Living, Bathroom, Kitchen } = useContext(ButtonContext);
 
 
     const [room, setRoom] = useState('off');
@@ -106,7 +106,7 @@ const Main = ( ) => {
     return (
         <View style={style.container}>
             <View style={style.exit}>
-                <TouchableOpacity onPress={()=>comparedUser()}>
+                <TouchableOpacity onPress={()=>setApproved(false)}>
                 {/* <MaterialIcons name="exit-to-app" size={24} color="#845ec2" /> */}
                 <MaterialCommunityIcons name="exit-run" size={24} color="#845ec2" />
                 </TouchableOpacity>

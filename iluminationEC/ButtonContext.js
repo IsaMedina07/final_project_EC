@@ -10,15 +10,15 @@ const db = getFirestore(appFirebase);
 export const ButtonContext = createContext();
 
 export const TokenProvider = ({ children }) => {
-    const [user, setUser] = useState('');
-    const [password, setPassword] = useState('');
+    const [user, setUser] = useState(null);
+    const [password, setPassword] = useState(null);
 
     const [Room, setRoom] = useState(false);
     const [Living, setLiving] = useState(false);
     const [Bathroom, setBathroom] = useState(false);
     const [Kitchen, setKitchen] = useState(false);
 
-    const [approved, setApproved] = useState(null);
+    const [approved, setApproved] = useState(false);
 
     useEffect(() => {
         const loadUser = () =>{
@@ -95,7 +95,7 @@ export const TokenProvider = ({ children }) => {
     };
 
     const comparedUser = (getUserData, getPasswordData) =>{
-        setApproved(user === getUserData && password === getPasswordData)
+        return (user === getUserData && password === getPasswordData) ? true : false;
     }
 
     return (
