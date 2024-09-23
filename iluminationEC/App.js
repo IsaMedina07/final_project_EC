@@ -1,20 +1,19 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import Login from './src/screens/private/Main';
+import { StyleSheet, View } from 'react-native'
+import { TokenProvider } from './ButtonContext';
+import Router from './Router'
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      < Login />
-    </View>
+    <TokenProvider>
+      <View style={styles.container}>
+        < Router />
+      </View>
+    </TokenProvider>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });
