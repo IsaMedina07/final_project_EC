@@ -1,107 +1,73 @@
-import React, {createContext, useState, useEffect} from 'react'
-// import AsyncStorage from '@react-native-async-storage/async-storage'
+import React, { createContext, useState, useEffect } from 'react';
+import { getDatabase, ref, onValue, update, push } from 'firebase/database';
+import appFirebase from './Credentials';
+import { Password } from '@mui/icons-material';
 
-// Importaciones de firebase
-import appFirebase from './Credentials'
-import {getFirestore, collection, getDocs, doc, setDoc, onSnapshot, updateDoc } from 'firebase/firestore' // Tiempo real: onSnapshot
-
-const db = getFirestore(appFirebase);
+const db = getDatabase(appFirebase);
 
 export const ButtonContext = createContext();
 
-export const TokenProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
-    const [password, setPassword] = useState(null);
+export const ButtonProvider = ({ children }) => {
+    // const [user, setUser] = useState([]);
+    user = { id: 0, name: "admin", Password: "1234" }
 
-    const [Room, setRoom] = useState(false);
-    const [Living, setLiving] = useState(false);
-    const [Bathroom, setBathroom] = useState(false);
-    const [Kitchen, setKitchen] = useState(false);
+    const [rooms, setRooms] = useState({});
 
     const [approved, setApproved] = useState(false);
 
-    useEffect(() => {
-        const loadUser = () =>{
-            /*const storedData = await getDocs(collection(db, 'Usuarios'));
-            const userData = [];
-            
-            storedData.forEach(doc => {
-                userData.push({ 
-                    id: doc.id, 
-                    ...doc.data(),
-                });
+    const loadUser = () => {
+        const userRef = ref(db, 'users');
+        onValue(userRef, (snapshot) => {
+            const data = snapshot.val();
+            data.map(element => {
+                setUser(element)
             });
-            
-            setUser(userData[0].nombre)
-            setPassword(userData[0].contrasena);*/
+        });
+    };
 
-            // Forma en tiempo real:
-            onSnapshot(collection(db, 'Usuarios'), query =>{
-                const userData = [];
-                query.forEach(doc =>{
-                    userData.push({
-                        id:doc.id,
-                        ...doc.data(),
-                    })
-                })
-                
-                setUser(userData[0].nombre)
-                setPassword(userData[0].contrasena);
-            })
-        }
+    const loadRooms = () => {
+        const roomRef = ref(db, `users/${user.id}/rooms`);
+        onValue(roomRef, (snapshot) => {
+            const data = snapshot.val();
+            setTimeout(() => {
+                setRooms(data)
+            }, 1000);
+        });
+    };
 
-        const loadRooms = () =>{
-            onSnapshot(collection(db, 'Habitaciones'), query =>{
-                const roomsData = [];
-                query.forEach(doc =>{
-                    roomsData.push({
-                        id:doc.id,
-                        ...doc.data(),
-                    })
-                })
-
-                setRoom(roomsData[0].room);
-                setLiving(roomsData[0].living);
-                setBathroom(roomsData[0].bathroom);
-                setKitchen(roomsData[0].kitchen);
-            })
-        }
-
-        loadUser();
-        loadRooms();
-
-        // console.log('\nUsuario:',user,'\nContraseña:', password, '\nCuarto:',Room, '\nSala:',Living, '\nBaño:',Bathroom, '\nCocina:',Kitchen)
-
-    }, [user, approved, password, Room, Living, Bathroom, Kitchen]);
-
-    const toggleRoom = (roomType, bool=null) => {
+    const toggleRoom = (nameRoom, bool = null) => {
         try {
-            const roomDocRef = doc(db, 'Habitaciones', 'Mkjwqkvf5meuq2wkgLHz');
+            const updateRoom = { ...rooms, [nameRoom]: bool };
+            const userRef = ref(db, 'users/' + user.id + '/rooms');
 
-            if(bool == null){
-                updateDoc(roomDocRef, {
-                    [roomType]: !Room
+            update(userRef, updateRoom)
+                .then(() => {
+                    setRooms(updateRoom); // Actualiza el estado en el contexto
+                })
+                .catch((error) => {
+                    console.log('Error al actualizar habitación: ', error);
                 });
-                setRoom(!Room)
-            }else{
-                updateDoc(roomDocRef, {
-                    [roomType]: bool
-                });
-            }
-    
+
         } catch (error) {
             console.log('Error --> ', error);
         }
     };
 
-    const comparedUser = (getUserData, getPasswordData) =>{
-        return (user === getUserData && password === getPasswordData) ? true : false;
-    }
+    toggleRoom('room', true);
 
     return (
-        <ButtonContext.Provider 
-            value = {{ user, approved, password, Room, Living, Bathroom, Kitchen, toggleRoom, comparedUser, setApproved }}>
-                {children}
+        <ButtonContext.Provider
+            value={{
+                approved,
+                rooms,
+                toggleRoom,
+                setApproved,
+                // setUser,
+                loadUser,
+                loadRooms,
+            }}
+        >
+            {children}
         </ButtonContext.Provider>
     );
 };

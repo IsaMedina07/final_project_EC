@@ -1,14 +1,15 @@
 import { StyleSheet, View } from 'react-native'
-import { TokenProvider } from './ButtonContext';
+import { ButtonProvider } from './ButtonContext';
 import Router from './Router'
+import Login from './src/screens/public/Login';
 
 export default function App() {
   return (
-    <TokenProvider>
+    <ButtonProvider>
       <View style={styles.container}>
-        < Router />
+        < Login />
       </View>
-    </TokenProvider>
+    </ButtonProvider>
   );
 }
 

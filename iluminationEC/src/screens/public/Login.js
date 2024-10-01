@@ -4,7 +4,10 @@ import React, { useState, useContext } from 'react'
 import { ButtonContext } from "../../../ButtonContext"
 
 const Login = () => {
-    const { comparedUser, setApproved, approved } = useContext(ButtonContext);
+    const { comparedUser, setApproved, loadRooms } = useContext(ButtonContext);
+
+    loadRooms(1)
+
 
     const [user, setUser] = useState('');
     const [password, setPassword] = useState('');
