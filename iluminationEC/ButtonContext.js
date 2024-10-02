@@ -1,70 +1,93 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { getDatabase, ref, onValue, update, push } from 'firebase/database';
+import { getDatabase, ref, onValue, set, update, push } from 'firebase/database';
 import appFirebase from './Credentials';
-import { Password } from '@mui/icons-material';
 
 const db = getDatabase(appFirebase);
 
 export const ButtonContext = createContext();
 
 export const ButtonProvider = ({ children }) => {
-    // const [user, setUser] = useState([]);
-    user = { id: 0, name: "admin", Password: "1234" }
-
-    const [rooms, setRooms] = useState({});
-
+    const [data, setData] = useState([]);
+    const [userId, setUserId] = useState(null);
+    const [dictRooms, setDictRooms] = useState([]);
+    const [roomsUser, setRoomsUser] = useState([]); // [ {id: 0, name: room, status:false} ]
     const [approved, setApproved] = useState(false);
 
-    const loadUser = () => {
-        const userRef = ref(db, 'users');
-        onValue(userRef, (snapshot) => {
-            const data = snapshot.val();
-            data.map(element => {
-                setUser(element)
-            });
+    useEffect(() => {
+        const reference = ref(db, 'users/');
+        onValue(reference, (snapshot) => {
+            const datos = snapshot.val();
+            const newUsers = Object.keys(datos).map(key => ({
+                id: key,
+                ...datos[key],
+            }))
+            // console.log(newUsers);
+            setData(newUsers);
         });
-    };
 
-    const loadRooms = () => {
-        const roomRef = ref(db, `users/${user.id}/rooms`);
-        onValue(roomRef, (snapshot) => {
-            const data = snapshot.val();
-            setTimeout(() => {
-                setRooms(data)
-            }, 1000);
+        if (!userId) return; // No ejecuta si no hay usuario
+
+        const roomRef = ref(db, `users/${userId}/rooms`);
+
+        const unsubscribe = onValue(roomRef, (snapshot) => {
+            const roomsData = snapshot.val();
+            if (roomsData) {
+                setDictRooms(roomsData); // Actualizamos el estado de las habitaciones
+                listRooms(roomsData); // Llamamos a listRooms para formatear las habitaciones
+            }
         });
-    };
 
-    const toggleRoom = (nameRoom, bool = null) => {
-        try {
-            const updateRoom = { ...rooms, [nameRoom]: bool };
-            const userRef = ref(db, 'users/' + user.id + '/rooms');
+        // Cleanup cuando se desmonte el componente o cambie el userId
+        return () => unsubscribe();
 
-            update(userRef, updateRoom)
-                .then(() => {
-                    setRooms(updateRoom); // Actualiza el estado en el contexto
-                })
-                .catch((error) => {
-                    console.log('Error al actualizar habitación: ', error);
-                });
+    }, [userId])
 
-        } catch (error) {
-            console.log('Error --> ', error);
+    const updateRoom = (room, status) => {
+        update(ref(db, `users/${userId}/rooms`), {
+            [room]: status,
+        });
+
+        const ferencia = ref(db, `users/${userId}/rooms`);
+        onValue(ferencia, (snapshot) => {
+            const datos = snapshot.val();
+            // console.log('Datos --> ', datos);
+            setDictRooms(datos);
+        })
+    }
+
+    const findUser = (name, password) => {
+        for (let i of data) {
+            if ((i.name).trim().toLowerCase() == name && (i.password).trim().toLowerCase() == password) {
+                return i
+            }
         }
+        return null
+    }
+
+    const listRooms = (dict = null) => {
+        const names = Object.keys(dict || dictRooms);
+        const arrayRooms = names.map((name, index) => ({
+            id: index,
+            name,
+            status: dict ? dict[name] : dictRooms[name]
+        }));
+
+        setRoomsUser(arrayRooms);
     };
 
-    toggleRoom('room', true);
 
     return (
         <ButtonContext.Provider
             value={{
+                data,
                 approved,
-                rooms,
-                toggleRoom,
+                roomsUser,
+                setUserId,
+                setDictRooms,
+                updateRoom,
+                findUser,
                 setApproved,
-                // setUser,
-                loadUser,
-                loadRooms,
+                listRooms,
             }}
         >
             {children}

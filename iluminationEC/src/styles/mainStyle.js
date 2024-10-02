@@ -24,13 +24,15 @@ const styles = StyleSheet.create({
     },
     target:{
         minWidth: '47%',
-        minHeight: '40%',
+        minHeight: '47%',
         borderRadius: 20,
         borderWidth: 2,
         borderColor: '#845ec2',
         alignItems: 'center',
         justifyContent: 'center',
         position: 'relative',
+        backgroundColor:'#000',
+        flexDirection: 'row',
     },
     button:{
         minWidth:'100%',
@@ -51,6 +53,17 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top:10,
         right:15,
+    },
+    scroll:{
+        maxHeight: '85%',
+        minHeight: '85%',
+        backgroundColor:'transparent',
+        display: 'flex',
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        justifyContent:'space-around',
+        rowGap:10,
     }
 })
 export default styles

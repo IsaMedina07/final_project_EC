@@ -4,31 +4,32 @@ import React, { useState, useContext } from 'react'
 import { ButtonContext } from "../../../ButtonContext"
 
 const Login = () => {
-    const { comparedUser, setApproved, loadRooms } = useContext(ButtonContext);
-
-    loadRooms(1)
-
+    const { setUserId, findUser, setApproved, approved, listRooms, setDictRooms } = useContext(ButtonContext);
 
     const [user, setUser] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleLogin = () => {
-        const compared = comparedUser(user.trim().toLowerCase(), password.trim().toLowerCase());
-
-        console.log(compared)
-
-        if(compared){
-            setApproved(compared);
+    const handleLogin = async() => {
+        const compared = findUser(user.trim().toLowerCase(), password.trim().toLowerCase());
+        
+        if (compared) {
+            await setUserId(compared.id);
+            await setDictRooms(compared.rooms);
+            await listRooms(compared.rooms);
+            await setApproved(true);
+            setUser('');
+            setPassword('');
             return
         }
 
-        if(user == '' || password == ''){
-            Alert.alert('Error', 'Los campos son obligatorios')
+        if (user == '' || password == '') {
+            Alert.alert('Error', 'Los campos son obligatorios');
         }
-        else if(!approved){
+        else if (!approved) {
             setUser('');
             setPassword('');
-            Alert.alert('Error', 'Credenciales incorrectas')
+            await setDictRooms({});
+            Alert.alert('Error', 'Credenciales incorrectas');
         }
     }
 
