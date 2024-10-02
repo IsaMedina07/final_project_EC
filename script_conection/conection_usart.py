@@ -8,7 +8,6 @@ import asyncio
 # Variables globales
 cambio_en_la_base_de_datos = ''
 cambio_detectado = False
-cambio_inicial = False
 cambio_iniciado_desde_yat = False  # Nueva variable de control
 
 # Inicializar la conexión con Firebase
@@ -22,6 +21,7 @@ client_socket.connect(('192.168.254.184', 2323))
 
 # Envío del mensaje "dummy" para sincronización
 print("Preparando el socket, enviando mensaje de sincronización inicial...")
+cambio_inicial = False
 client_socket.sendall(b"ready\n")  # Mensaje "dummy" inicial
 
 async def get_data_from_firebase():
@@ -83,6 +83,7 @@ async def run_firebase_listener():
     initial_data = await get_data_from_firebase()
     print(f"Datos iniciales: {initial_data}")
     await listen_for_changes()
+    time.sleep(1)
     cambio_inicial = True
 
 # Ejecutar el listener en un hilo separado
