@@ -22,7 +22,7 @@ client_socket.connect(('192.168.254.184', 2323))
 # Envío del mensaje "dummy" para sincronización
 print('------- ------- ------- -------')
 print("Preparando el socket, enviando mensaje de sincronización inicial...")
-print('------- ------- ------- -------')
+print('------- ------- ------- -------\n')
 
 cambio_inicial = False
 client_socket.sendall(b"ready\n")  # Mensaje "dummy" inicial
@@ -62,7 +62,7 @@ async def update_data_in_firebase(room, status):
     updated_data = {f"{room}": status}
     cambio_iniciado_desde_yat = True  # Activamos la bandera cuando hacemos un cambio desde YAT
     ref.update(updated_data)
-    print(f"Datos actualizados desde el Huart:\n        {updated_data}")
+    print(f"Datos actualizados desde el Huart:\n        {updated_data}\n")
 
 async def main(key='', value=''):
     if key and value is not None:
@@ -75,7 +75,10 @@ def receive_data():
         variable = client_socket.recv(1024).decode()
         cont = variable.find(":")
         name = variable[0:cont]
+        # status = bool((variable[cont + 1:]))
         status = bool(int(variable[cont + 1:]))
+
+        print(f"-- VARIABLE -- : {variable}")
 
         # print(f"NAME --> {name} \nSTATUS --> {status}")
         asyncio.run(main(name, status))
@@ -84,7 +87,7 @@ def receive_data():
 async def run_firebase_listener():
     global cambio_inicial
     initial_data = await get_data_from_firebase()
-    print(f"Datos iniciales: {initial_data}")
+    print(f"Datos iniciales: {initial_data}\n")
     await listen_for_changes()
     time.sleep(1)
     cambio_inicial = True
@@ -102,7 +105,7 @@ time.sleep(1)
 while True:
     # Solo imprimimos cuando se detecta un cambio
     if cambio_detectado:
-        print(f"Cambio desde la App:\n          {cambio_en_la_base_de_datos}")
+        print(f"Cambio desde la App:\n          {cambio_en_la_base_de_datos}\n")
 
         # Datos que recibe la el huart del parámetro a enviar [ Change ----> HUART ]
         client_socket.sendall(str(cambio_en_la_base_de_datos).encode()+ b'\n')
