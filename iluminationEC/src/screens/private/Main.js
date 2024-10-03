@@ -13,6 +13,14 @@ const Main = () => {
         updateRoom(name, !value); // Cambiamos el valor en Firebase
     };
 
+    const offAll = () => {
+        roomsUser.map( room => {
+            setTimeout(() => {
+                updateRoom(room.name, false);
+            }, 1000);
+        })
+    };
+
     return (
         <View style={style.container}>
             <View style={style.exit}>

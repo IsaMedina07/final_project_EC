@@ -20,7 +20,10 @@ client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_socket.connect(('192.168.254.184', 2323))
 
 # Envío del mensaje "dummy" para sincronización
+print('------- ------- ------- -------')
 print("Preparando el socket, enviando mensaje de sincronización inicial...")
+print('------- ------- ------- -------')
+
 cambio_inicial = False
 client_socket.sendall(b"ready\n")  # Mensaje "dummy" inicial
 
@@ -59,7 +62,7 @@ async def update_data_in_firebase(room, status):
     updated_data = {f"{room}": status}
     cambio_iniciado_desde_yat = True  # Activamos la bandera cuando hacemos un cambio desde YAT
     ref.update(updated_data)
-    print(f"Datos actualizados desde el Huart: {updated_data}")
+    print(f"Datos actualizados desde el Huart:\n        {updated_data}")
 
 async def main(key='', value=''):
     if key and value is not None:
@@ -99,7 +102,7 @@ time.sleep(1)
 while True:
     # Solo imprimimos cuando se detecta un cambio
     if cambio_detectado:
-        print(f"Cambio desde la App -->  {cambio_en_la_base_de_datos}")
+        print(f"Cambio desde la App:\n          {cambio_en_la_base_de_datos}")
 
         # Datos que recibe la el huart del parámetro a enviar [ Change ----> HUART ]
         client_socket.sendall(str(cambio_en_la_base_de_datos).encode()+ b'\n')
