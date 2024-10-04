@@ -75,10 +75,12 @@ def receive_data():
         variable = client_socket.recv(1024).decode()
         cont = variable.find(":")
         name = variable[0:cont]
+
+        print(f"-- VARIABLE -- : {variable}")
+
         # status = bool((variable[cont + 1:]))
         status = bool(int(variable[cont + 1:]))
 
-        print(f"-- VARIABLE -- : {variable}")
 
         # print(f"NAME --> {name} \nSTATUS --> {status}")
         asyncio.run(main(name, status))
@@ -108,7 +110,7 @@ while True:
         print(f"Cambio desde la App:\n          {cambio_en_la_base_de_datos}\n")
 
         # Datos que recibe la el huart del parámetro a enviar [ Change ----> HUART ]
-        client_socket.sendall(str(cambio_en_la_base_de_datos).encode()+ b'\n')
+        client_socket.sendall(str(cambio_en_la_base_de_datos).encode()+ b'\r\n')
         cambio_detectado = False  # Reseteamos la variable para esperar nuevos cambios
     
     # Añadimos un pequeño retraso para evitar sobrecargar la CPU
